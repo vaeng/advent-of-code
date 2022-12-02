@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8"/>
+<title>Leaderboard - Advent of Code 2021</title>
+<!--[if lt IE 9]><script src="/static/html5.js"></script><![endif]-->
+<link href='//fonts.googleapis.com/css?family=Source+Code+Pro:300&subset=latin,latin-ext' rel='stylesheet' type='text/css'/>
+<link rel="stylesheet" type="text/css" href="/static/style.css?30"/>
+<link rel="stylesheet alternate" type="text/css" href="/static/highcontrast.css?0" title="High Contrast"/>
+<link rel="shortcut icon" href="/favicon.png"/>
+<script>window.addEventListener('click', function(e,s,r){if(e.target.nodeName==='CODE'&&e.detail===3){s=window.getSelection();s.removeAllRanges();r=document.createRange();r.selectNodeContents(e.target);s.addRange(r);}});</script>
+</head><!--
+
+
+
+
+Oh, hello!  Funny seeing you here.
+
+I appreciate your enthusiasm, but you aren't going to find much down here.
+There certainly aren't clues to any of the puzzles.  The best surprises don't
+even appear in the source until you unlock them for real.
+
+Please be careful with automated requests; I'm not a massive company, and I can
+only take so much traffic.  Please be considerate so that everyone gets to play.
+
+If you're curious about how Advent of Code works, it's running on some custom
+Perl code. Other than a few integrations (auth, analytics, social media), I
+built the whole thing myself, including the design, animations, prose, and all
+of the puzzles.
+
+The puzzles are most of the work; preparing a new calendar and a new set of
+puzzles each year takes all of my free time for 4-5 months. A lot of effort
+went into building this thing - I hope you're enjoying playing it as much as I
+enjoyed making it for you!
+
+If you'd like to hang out, I'm @ericwastl on Twitter.
+
+- Eric Wastl
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-->
+<body>
+<header><div><h1 class="title-global"><a href="/">Advent of Code</a></h1><nav><ul><li><a href="/2021/about">[About]</a></li><li><a href="/2021/events">[Events]</a></li><li><a href="https://teespring.com/stores/advent-of-code" target="_blank">[Shop]</a></li><li><a href="/2021/settings">[Settings]</a></li><li><a href="/2021/auth/logout">[Log Out]</a></li></ul></nav><div class="user">vaeng <span class="star-count">44*</span></div></div><div><h1 class="title-event">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="title-event-wrap">λy.</span><a href="/2021">2021</a><span class="title-event-wrap"></span></h1><nav><ul><li><a href="/2021">[Calendar]</a></li><li><a href="/2021/support">[AoC++]</a></li><li><a href="/2021/sponsors">[Sponsors]</a></li><li><a href="/2021/leaderboard">[Leaderboard]</a></li><li><a href="/2021/stats">[Stats]</a></li></ul></nav></div></header>
+
+<div id="sidebar">
+<div id="sponsor"><div class="quiet">Our <a href="/2021/sponsors">sponsors</a> help make Advent of Code possible:</div><div class="sponsor"><a href="https://shopify.engineering/?utm_campaign=advent_of_code&amp;utm_medium=cpc" target="_blank" onclick="if(ga)ga('send','event','sponsor','sidebar',this.href);" rel="noopener">Shopify</a> - Check out our engineering blog and learn how Yule be able to solve commerce problems at scale by joining Shopify. Happy Holidays!</div></div>
+</div><!--/sidebar-->
+
+<main>
+<article><p>These are your personal leaderboard statistics.  <em>Rank</em> is your position on that leaderboard: 1 means you were the first person to get that star, 2 means the second, 100 means the 100th, etc.  <em>Score</em> is the number of points you got for that rank: 100 for 1st, 99 for 2nd, ..., 1 for 100th, and 0 otherwise.</p><pre>      <span class="leaderboard-daydesc-first">--------Part 1--------</span>   <span class="leaderboard-daydesc-both">--------Part 2--------</span>
+Day   <span class="leaderboard-daydesc-first">    Time   Rank  Score</span>   <span class="leaderboard-daydesc-both">    Time   Rank  Score</span>
+ 22   04:27:12   7776      0   16:08:38   7312      0
+ 21   04:27:39   9889      0   14:11:54  10425      0
+ 20   13:50:33  12374      0   13:52:20  11962      0
+ 19   12:14:37   5015      0   12:39:34   4905      0
+ 18   16:26:52  10715      0   17:13:20  10828      0
+ 17   12:09:11  17337      0   16:27:02  18337      0
+ 16   09:52:24  12324      0   11:30:11  12061      0
+ 15   04:30:23  10825      0   05:04:24   8299      0
+ 14   04:12:44  17593      0   04:13:21  10105      0
+ 13   03:47:31  13922      0   04:05:31  13460      0
+ 12   04:35:35  12066      0   09:05:08  17743      0
+ 11   00:55:19   5098      0   01:02:08   5175      0
+ 10   03:31:58  18065      0   05:36:27  21676      0
+  9   04:42:06  23845      0   06:26:21  18814      0
+  8   03:51:29  23190      0   06:19:09  16127      0
+  7   02:45:21  20907      0   05:09:59  28565      0
+  6   03:59:15  24262      0   04:00:05  17636      0
+  5   08:04:50  28800      0   08:17:51  25659      0
+  4   01:40:15   8806      0   02:03:28   8485      0
+  3   02:06:13  21024      0   05:40:21  26615      0
+  2   04:04:47  37333      0   04:09:45  34731      0
+  1   14:25:36  79128      0   14:49:11  70192      0
+</pre>
+</article>
+</main>
+
+<!-- ga -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-69522494-1', 'auto');
+ga('set', 'anonymizeIp', true);
+ga('send', 'pageview');
+</script>
+<!-- /ga -->
+</body>
+</html>
