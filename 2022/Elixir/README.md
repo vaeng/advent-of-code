@@ -3,12 +3,12 @@
 
 ## Solved Problems and Benchmark
 
-Operating System: Linux
-CPU Information: AMD Ryzen 5 3600 6-Core Processor
-Number of Available Cores: 12
-Available memory: 7.74 GB
-Elixir 1.14.2
-Erlang 25.1.2
+Operating System: Ubuntu 20.04 docker container\
+CPU Information: AMD Ryzen 5 3600 6-Core Processor\
+Number of Available Cores: 12\
+Available memory: 7.74 GB\
+Elixir 1.14.2\
+Erlang 25.1.2\
 
 **Problem**|**ips**|**average**|**deviation**|**median**|**99th %**
 :-----:|:-----:|:-----:|:-----:|:-----:|:-----:
