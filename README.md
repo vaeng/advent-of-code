@@ -4,13 +4,13 @@
 <h1 align="center">
     2022 - 6 ⭐
   </h1>
-  <a href="AoCTiles\2022\01\01.ex">
+  <a href="2022\Elixir\lib\advent_of_code\day_01.ex">
     <img src="AoCTiles\Media\2022\01.png" width="161px">
   </a>
-  <a href="AoCTiles\2022\02\02.ex">
+  <a href="2022\Elixir\lib\advent_of_code\day_02.ex">
     <img src="AoCTiles\Media\2022\02.png" width="161px">
   </a>
-    <a href="">
+    <a href="2022\Elixir\lib\advent_of_code\day_03.ex">
     <img src="AoCTiles\Media\2022\03.png" width="161px">
   </a>
   <h1 align="center">
