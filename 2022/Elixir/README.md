@@ -9,6 +9,8 @@
 [Day 1.2](https://github.com/vaeng/advent-of-code/blob/main/2022/Elixir/lib/advent_of_code/day_01.ex)|2.52 K|396.61 μs|±106.20%|332.13 μs|2190.37 μs
 [Day 2.1](https://github.com/vaeng/advent-of-code/blob/main/2022/Elixir/lib/advent_of_code/day_02.ex)|6.53 K|153.18 μs|±42.12%|136.55 μs|391.61 μs
 [Day 2.2](https://github.com/vaeng/advent-of-code/blob/main/2022/Elixir/lib/advent_of_code/day_02.ex)|7.06 K|141.73 μs|±21.97%|132.29 μs|266.75 μs
+[Day 3.1](https://github.com/vaeng/advent-of-code/blob/main/2022/Elixir/lib/advent_of_code/day_03.ex)|559.00|1.79 ms|±12.60%|1.72 ms|2.77 ms
+[Day 3.2](https://github.com/vaeng/advent-of-code/blob/main/2022/Elixir/lib/advent_of_code/day_03.ex)|566.39|1.77 ms|±6.98%|1.73 ms|2.27 ms
 
 ### Test Setup
 <sup>Operating System: Ubuntu 20.04 docker container\

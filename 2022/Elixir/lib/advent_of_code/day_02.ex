@@ -1,13 +1,13 @@
 defmodule AdventOfCode.Day02 do
   def part1(args) do
     convertToLine(args)
-    |> Enum.map(&getScore(&1))
+    |> Enum.map(&getScore/1)
     |> Enum.sum()
   end
 
   def part2(args) do
     convertToLine(args)
-    |> Enum.map(&getScore2(&1))
+    |> Enum.map(&getScore2/1)
     |> Enum.sum()
   end
 
