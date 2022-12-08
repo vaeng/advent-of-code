@@ -41,4 +41,16 @@ defmodule AdventOfCode.Day07Test do
 
     assert result
   end
+
+  @tag :skip
+  test "getSizes" do
+    emptyMap = %{}
+    assert getSize(emptyMap) == 0
+
+    # nestedEmptyMap = %{"/" => %{}}
+    # assert getSize(nestedEmptyMap) == 0
+
+    # deeplyNestedEmptyMap = %{"/" => %{"abc" => %{}, "bcd" => %{"qed" => %{}}}}
+    # assert getSize(deeplyNestedEmptyMap) == 0
+  end
 end
