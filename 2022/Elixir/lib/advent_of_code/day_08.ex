@@ -5,20 +5,36 @@ defmodule AdventOfCode.Day08 do
   def part2(_args) do
   end
 
-  def numberOfCodeChars(_input) do
-    {:ok, content} = File.read("./lib/advent_of_code/day_08.input")
-    content |> String.split("\n") |> Enum.map(&String.length(&1))
+  def inputToNumGrid(input) do
+    input
+    |> String.trim()
+    |> String.split("\n")
+    |> Enum.map(&(String.codepoints(&1)
+                   |> Enum.map(fn x -> String.to_integer(x) end)))
   end
 
-  def numberOfMemoryChars(_input) do
-    {:ok, content} = File.read("./lib/advent_of_code/day_08.input")
+  def setAllToUnknown(numgrid) do
+    numgrid |> Enum.map(&Enum.map(&1, fn x -> [x, :unknown] end))
+  end
 
-    content
-    |> String.split("\n")
-    |> Enum.map(&String.slice(&1, 1..-2))
-    |> Enum.map(&String.replace(&1, ~r/\\x\d\d/, "A"))
-    |> Enum.map(&String.replace(&1, ~r/\\\\/, "A"))
-    |> Enum.map(&String.replace(&1, ~r/\\\"/, "A"))
-    |> Enum.map(&String.length/1)
+  def initializeBoarders(tagGrid) do
+    tagGrid
+    |> setFirstRowVis() # top
+    |> transpose()
+    |> setFirstRowVis() # left
+    |> transpose()
+    |> setFirstRowVis() # down
+    |> transpose()
+    |> setFirstRowVis() # right
+    |> transpose() # return in original orientation
+  end
+
+  def setFirstRowVis([firstRow | rest]) do
+    visFirst = firstRow |> Enum.map( fn [x, _] -> [x, :vis] end)
+    [visFirst | rest]
+  end
+
+  def transpose(rows) do
+    rows |> List.zip|> Enum.map(&Tuple.to_list/1)
   end
 end
