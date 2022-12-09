@@ -90,7 +90,7 @@ defmodule AdventOfCode.Day07 do
             update_in(root, access_path, &(Map.put(&1, item.name,  item)))
           else
             key = if item.type == :dir, do: :folders, else: :files
-            update(root, )
+            # update(root, )
           end
       end
     end
