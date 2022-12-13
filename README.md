@@ -2,7 +2,7 @@
 
   <!-- AOC TILES BEGIN -->
 <h1 align="center">
-    2022 - 8 ⭐
+    2022 - 26 ⭐
   </h1>
   <a href="2022\Elixir\lib\advent_of_code\day_01.ex">
     <img src="AoCTiles\Media\2022\01.png" width="161px">
@@ -13,10 +13,38 @@
     <a href="2022\Elixir\lib\advent_of_code\day_03.ex">
     <img src="AoCTiles\Media\2022\03.png" width="161px">
   </a>
-    </a>
     <a href="2022\Elixir\lib\advent_of_code\day_04.ex">
     <img src="AoCTiles\Media\2022\04.png" width="161px">
   </a>
+    </a>
+  <a href="2022\Elixir\lib\advent_of_code\day_05.ex">
+    <img src="AoCTiles\Media\2022\05.png" width="161px">
+  </a>
+  <a href="2022\Elixir\lib\advent_of_code\day_06.ex">
+    <img src="AoCTiles\Media\2022\06.png" width="161px">
+  </a>
+  <a href="2022\Elixir\lib\advent_of_code\day_07.ex">
+    <img src="AoCTiles\Media\2022\07.png" width="161px">
+  </a>
+  <a href="2022\Elixir\lib\advent_of_code\day_08.ex">
+    <img src="AoCTiles\Media\2022\08.png" width="161px">
+  </a>
+  <a href="2022\Elixir\lib\advent_of_code\day_09.ex">
+    <img src="AoCTiles\Media\2022\09.png" width="161px">
+  </a>
+  <a href="2022\Elixir\lib\advent_of_code\day_10.ex">
+    <img src="AoCTiles\Media\2022\10.png" width="161px">
+  </a>
+  <a href="2022\Elixir\lib\advent_of_code\day_11.ex">
+    <img src="AoCTiles\Media\2022\11.png" width="161px">
+  </a>
+  <a href="2022\Elixir\lib\advent_of_code\day_12.ex">
+    <img src="AoCTiles\Media\2022\12.png" width="161px">
+  </a>
+  <a href="2022\Elixir\lib\advent_of_code\day_13.ex">
+    <img src="AoCTiles\Media\2022\13.png" width="161px">
+  </a>
+
   <h1 align="center">
     2021 - 44 ⭐
   </h1>
