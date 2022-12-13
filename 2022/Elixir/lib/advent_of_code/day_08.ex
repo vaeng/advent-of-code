@@ -1,8 +1,12 @@
 defmodule AdventOfCode.Day08 do
-  def part1(_args) do
+  import AdventOfCode.Util
+
+  def part1(args) do
+    args |> inputToNumGrid() |> countVisibilityOnGrid()
   end
 
-  def part2(_args) do
+  def part2(args) do
+    args |> inputToNumGrid() |> getMaxScenicScoreOnGrid()
   end
 
   def inputToNumGrid(input) do
@@ -15,69 +19,70 @@ defmodule AdventOfCode.Day08 do
     )
   end
 
-  def setAllToUnknown(numgrid) do
-    numgrid |> Enum.map(&Enum.map(&1, fn x -> [x, :unknown] end))
+  @spec getScenicScore([list], integer, integer) :: number
+  def getScenicScore(grid, x, y) do
+    height = grid |> Enum.at(y) |> Enum.at(x)
+    allWest = getAllWest(grid, x, y) |> countVisibleTrees(height)
+    allEast = getAllEast(grid, x, y) |> countVisibleTrees(height)
+    allSouth = getAllSouth(grid, x, y) |> countVisibleTrees(height)
+    allNorth = getAllNorth(grid, x, y) |> countVisibleTrees(height)
+
+    Enum.product([allWest, allEast, allSouth, allNorth])
   end
 
-  def initializeBoarders(tagGrid) do
-    tagGrid
-    |> List.update_at(-1, &Enum.map(&1, fn [x, _] -> [x, :visible] end))
-    |> List.update_at(0, &Enum.map(&1, fn [x, _] -> [x, :visible] end))
-    |> Enum.map(fn [[x, _] | rest] -> [[x, :visible] | rest] end)
-    |> Enum.map(&List.update_at(&1, -1, fn [x, _] -> [x, :visible] end))
+  def countVisibleTrees(list, height) do
+    cansee = Enum.take_while(list, &(&1 < height)) |> length()
+    if cansee < length(list), do: cansee + 1, else: cansee
   end
 
-  def updateStatus(_, _, _, :visible, _), do: :visible
-  def updateStatus(_, _, _, :invisible, _), do: :invisible
+  def getMaxScenicScoreOnGrid(grid) do
+    yMax = length(grid) - 1
+    xMax = length(Enum.at(grid, 0)) - 1
 
-  def updateStatus(rix, cix, height, :unknown, grid) do
-    # [[hup, sup], [hdown, sdown], [hleft, sleft], [hright, sright]] = getEnvironment(grid, rix, cix)
-    getEnvironment(grid, rix, cix) |> Enum.any?()
-
-    # cases for: all blocking -> invis
-    # any is smaller and vis? -> vis
-    # else -> unknown
+    0..yMax
+    |> Enum.map(fn y -> Enum.map(0..xMax, &[&1, y]) end)
+    |> Enum.map(&Enum.map(&1, fn [x, y] -> AdventOfCode.Day08.getScenicScore(grid, x, y) end))
+    |> List.flatten()
+    |> Enum.max()
   end
 
-  def updateStatus(_, _, _, _, _), do: :error
+  def countVisibilityOnGrid(grid) do
+    yMax = length(grid) - 1
+    xMax = length(Enum.at(grid, 0)) - 1
 
-  def updateGrid(tagGrid) do
-    newStatus = fn _, _, _, _ -> :test end
-
-    workList =
-      tagGrid
-      |> Enum.with_index()
-      |> Enum.map(fn {row, rix} ->
-        Enum.with_index(row, fn element, cix -> [rix, cix, element] end)
-      end)
-      |> List.flatten()
-      |> Enum.chunk_every(4)
-
-    workList
-    |> Enum.reduce(tagGrid, fn [rix, cix, height, status], accgrid ->
-      List.update_at(
-        accgrid,
-        rix,
-        &List.update_at(&1, cix, fn [x, status] ->
-          [x, updateStatus(rix, cix, height, status, accgrid)]
-        end)
-      )
-    end)
+    0..yMax
+    |> Enum.map(fn y -> Enum.map(0..xMax, &[y, &1]) end)
+    |> Enum.map(&Enum.map(&1, fn [x, y] -> AdventOfCode.Day08.isVisible?(grid, x, y) end))
+    |> List.flatten()
+    |> Enum.count(&(&1 == true))
   end
 
-  def getVisibleTrees(grid), do: grid |> List.flatten() |> Enum.count(&(&1 == :visible))
+  def isVisible?(grid, x, y) do
+    height = grid |> Enum.at(y) |> Enum.at(x)
+    allWest = getAllWest(grid, x, y) |> Enum.all?(&(&1 < height))
+    allEast = getAllEast(grid, x, y) |> Enum.all?(&(&1 < height))
+    allSouth = getAllSouth(grid, x, y) |> Enum.all?(&(&1 < height))
+    allNorth = getAllNorth(grid, x, y) |> Enum.all?(&(&1 < height))
 
-  def updateStatusByCoordinate(grid, rix, cix, newStatus),
-    do: grid |> List.update_at(rix, &List.update_at(&1, cix, fn [x, _] -> [x, newStatus] end))
+    Enum.any?([allWest, allEast, allSouth, allNorth])
+  end
 
-  def getElement(grid, rix, cix),
-    do: grid |> Enum.fetch(rix) |> then(fn {_, row} -> Enum.fetch!(row, cix) end)
+  @doc """
+  Zero based access. Map origin is upper left corner at 0,0
+  """
+  def getAllWest(grid, x, y) do
+    grid |> Enum.fetch!(y) |> Enum.take(x) |> Enum.reverse()
+  end
 
-  def(getEnvironment(grid, rix, cix)) do
-    up = getElement(grid, rix - 1, cix)
-    down = getElement(grid, rix + 1, cix)
-    left = getElement(grid, rix, cix - 1)
-    right = getElement(grid, rix, cix + 1)
-    [up, down, left, right]
+  def getAllEast(grid, x, y) do
+    grid |> Enum.fetch!(y) |> Enum.drop(x + 1)
+  end
+
+  def getAllSouth(grid, x, y) do
+    grid |> transpose() |> Enum.fetch!(x) |> Enum.drop(y + 1)
+  end
+
+  def getAllNorth(grid, x, y) do
+    grid |> transpose() |> Enum.fetch!(x) |> Enum.take(y) |> Enum.reverse()
   end
 end

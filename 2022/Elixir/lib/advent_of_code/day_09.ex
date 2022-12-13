@@ -1,15 +1,6 @@
 defmodule AdventOfCode.Day09 do
-  @moduledoc """
-  This module is using named directions in a 2D Space.
-  The center X be [0,0]. eg. NN is [0,2].
-  |      |     |    |     |      |
-  |:----:|:---:|:---:|:---:|:----:|
-  | NWNW | NNW | NN | NNE | NENE |
-  | NWW  | NW  | N  | NE  | NEE  |
-  | WW   | W   | X  | E   | EE   |
-  | SWW  | SW  | S  | SE  | SEE  |
-  | SWSW | SSW | SS | SSE | SESE |
-  """
+  import AdventOfCode.Util
+
   def part1(args) do
     args
     |> parseInput()
@@ -65,7 +56,7 @@ defmodule AdventOfCode.Day09 do
       &(String.split(&1, " ")
         |> then(fn [dir, num] -> String.duplicate(dir, String.to_integer(num)) end))
     )
-    |> Enum.reduce("", &(&2 <> &1))
+    |> Enum.join()
   end
 
   def updateHead(h, "R"), do: getE(h)
@@ -103,33 +94,4 @@ defmodule AdventOfCode.Day09 do
       true -> raise "unknown skip"
     end
   end
-
-  def getN([x, y]), do: [x, y + 1]
-  def getNN([x, y]), do: [x, y + 2]
-  def getS([x, y]), do: [x, y - 1]
-  def getSS([x, y]), do: [x, y - 2]
-  def getW([x, y]), do: [x - 1, y]
-  def getWW([x, y]), do: [x - 2, y]
-  def getE([x, y]), do: [x + 1, y]
-  def getEE([x, y]), do: [x + 2, y]
-
-  def getSE([x, y]), do: [x + 1, y - 1]
-  def getSSE([x, y]), do: [x + 1, y - 2]
-  def getSEE([x, y]), do: [x + 2, y - 1]
-  def getSESE([x, y]), do: [x + 2, y - 2]
-
-  def getNE([x, y]), do: [x + 1, y + 1]
-  def getNNE([x, y]), do: [x + 1, y + 2]
-  def getNEE([x, y]), do: [x + 2, y + 1]
-  def getNENE([x, y]), do: [x + 2, y + 2]
-
-  def getSW([x, y]), do: [x - 1, y - 1]
-  def getSSW([x, y]), do: [x - 1, y - 2]
-  def getSWW([x, y]), do: [x - 2, y - 1]
-  def getSWSW([x, y]), do: [x - 2, y - 2]
-
-  def getNW([x, y]), do: [x - 1, y + 1]
-  def getNNW([x, y]), do: [x - 1, y + 2]
-  def getNWW([x, y]), do: [x - 2, y + 1]
-  def getNWNW([x, y]), do: [x - 2, y + 2]
 end

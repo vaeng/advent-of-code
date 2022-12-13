@@ -3,6 +3,7 @@ defmodule AdventOfCode.Day07Test do
 
   import AdventOfCode.Day07
 
+  @tag :skip
   test "part1" do
     input = """
     $ cd /
@@ -29,6 +30,9 @@ defmodule AdventOfCode.Day07Test do
     5626152 d.ext
     7214296 k
     """
+
+    input = String.trim(input)
+
     result = part1(input)
 
     assert result == 95437

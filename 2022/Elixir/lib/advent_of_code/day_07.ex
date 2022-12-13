@@ -1,130 +1,97 @@
 defmodule AdventOfCode.Day07 do
-  defmodule Folder do
-    @enforce_keys [:name]
-    defstruct [:name, files: %{}, folders: %{}, type: :dir]
-  end
-
-  defmodule File do
-    @enforce_keys [:name, :size]
-    defstruct [:name, :size, type: :file]
-  end
-
-  @doc"""
-  defimpl Inspect, for: Folder do
-    def inspect(folder, _opts) do
-      folderText = "" # folder.folders.keys()
-      fileText = "|- a file\n"
-      "-- {folder.name}\n" <> folderText <> fileText
-    end
-  end
-
-  defimpl Inspect, for: File do
-    def inspect(file, _opts) do
-      "-- {file.size} {file.name}\n"
-    end
-  end
-  """
-  defprotocol FileTree do
-    def size(value)
-  end
-
-  defimpl FileTree, for: Folder do
-    def size(dir), do:
-      dir.content
-      |> Enum.map(&FileTree.size/1)
-      |> Enum.sum()
-  end
-
-  defimpl FileTree, for: File do
-    def size(file), do: file.size
-  end
-
   @spec parseCommand(String.t()) :: list()
   def parseCommand(rawStr) do
     cond do
-      String.starts_with?(rawStr, "$ ls") -> [:ls]
-      String.starts_with?(rawStr, "$ cd") -> [:cd, String.trim_leading(rawStr, "$ cd ")]
-      String.starts_with?(rawStr, "dir") -> [:dir, String.trim_leading(rawStr, "dir ")]
+      String.starts_with?(rawStr, "$ ls") ->
+        [:ls]
+
+      String.starts_with?(rawStr, "$ cd") ->
+        [:cd, String.trim_leading(rawStr, "$ cd ")]
+
+      String.starts_with?(rawStr, "dir") ->
+        [:dir, String.trim_leading(rawStr, "dir ")]
+
       String.match?(rawStr, ~r/^\d+ .+$/) ->
         [size, name] = String.split(rawStr, " ")
         [:file, String.to_integer(size), name]
-      true -> [:unknown, rawStr]
+
+      true ->
+        [:unknown, rawStr]
     end
   end
 
-  @spec executeCommand(list(), list()) :: %Folder{}
-  def executeCommand([:cd, "/"], [_path, rootNode]), do: [["/"], rootNode]
-  def executeCommand([:cd, ".."], [["/"], rootNode]), do: [["/"], rootNode]
-  def executeCommand([:cd, ".."], [path, rootNode]), do: [Enum.drop(path, -1), rootNode]
-  def executeCommand([:cd, folder], [path, rootNode]) do
-     # nextNode = Enum.find(currentNode.content, fn x -> x.type == :dir && x.name == folder  end)
-     [ path ++ [folder], rootNode]
-  end
-  def executeCommand([:ls], [path, rootNode]), do: [path, rootNode]
-  def executeCommand([:file, size, name], [path, rootNode])
-    do
-      newFile = %File{name: name, size: size}
-      newTree = addItemToContent(path, rootNode, newFile)
-      [path, newTree]
-    end
-  def executeCommand([:dir, name], [path, rootNode])
-    do
-      newDir = %Folder{name: name}
-      newTree = addItemToContent(path, rootNode, newDir)
-      [path, newTree]
-    end
+  def executeCommand([:cd, "/"], [_path, rootNode, folders]),
+    do: [["/"], rootNode, folders]
 
-  @spec addItemToContent(list(), %Folder{}, %Folder{} | %File{}) :: %Folder{}
-  def addItemToContent(path, root, item) do
-    access_path = transformToAccessPath(path)
-    dir = if access_path == [], do: root, else: get_in(root, access_path)
-    IO.inspect(dir)
-    if duplicate?(dir, item)
-      do
-        root
-      else
-        # get_and_update_in(root, [Access.key(:files), Access.key(:abaa), Access.key(:size)], &{&1, &1 + 1000})
-        #get_and_update_in(root, path, fn currentFolder -> %{currentFolder | content: Map.update(dir.content, item.name, item)} end)
-        if access_path != []
-          do
-            update_in(root, access_path, &(Map.put(&1, item.name,  item)))
-          else
-            key = if item.type == :dir, do: :folders, else: :files
-            # update(root, )
-          end
-      end
-    end
+  def executeCommand([:cd, ".."], [["/"], rootNode, folders]),
+    do: [["/"], rootNode, folders]
 
-  def transformToAccessPath(path) do
-    path |> Enum.map(&Access.key/1) |> Enum.intersperse(Access.key(:folders)) |> Enum.drop(1)
-  end
+  def executeCommand([:cd, ".."], [path, rootNode, folders]),
+    do: [Enum.drop(path, -1), rootNode, folders]
 
-  @spec duplicate?(%Folder{}, %Folder{} | %File{}) :: boolean()
-  def duplicate?(folder, item) do
-    key = if item.type == :dir, do: :folders, else: :files
-    get_in(folder, [Access.key(key)]) |> Map.keys() |> Enum.member?(item.name)
-  end
+  def executeCommand([:cd, folder], [path, rootNode, folders]),
+    do: [path ++ [folder], rootNode, MapSet.put(folders, path ++ [folder])]
+
+  def executeCommand([:ls], [path, rootNode, folders]),
+    do: [path, rootNode, folders]
+
+  def executeCommand([:file, size, name], [path, rootNode, folders]),
+    do: [path, update_in(rootNode, path, &Map.put(&1, name, size)), folders]
+
+  def executeCommand([:dir, name], [path, rootNode, folders]),
+    do: [path, update_in(rootNode, path, &Map.put(&1, name, %{})), folders]
 
   def part1(args) do
-    root = %Folder{name: "/"}
+    root = %{"/" => %{}}
 
-    tree = args
-    |> String.trim()
-    |> String.split("\n")
-    |> Enum.map(&parseCommand/1)
-    |> Enum.reduce(["/", root], fn x, acc -> executeCommand(x, acc) end)
+    [_, tree, visitedPaths] =
+      args
+      |> String.trim()
+      |> String.split("\n")
+      |> Enum.map(&parseCommand/1)
+      |> Enum.reduce(["/", root, MapSet.new([["/"]])], fn x, acc -> executeCommand(x, acc) end)
 
-    IO.inspect(tree)
+    visitedPaths
+    |> Enum.map(&(get_in(tree, &1) |> getSize()))
+    |> Enum.filter(&(&1 <= 100_000))
+    |> Enum.sum()
   end
 
-  def part2(_args) do
+  def part2(args) do
+    root = %{"/" => %{}}
+
+    [_, tree, visitedPaths] =
+      args
+      |> String.trim()
+      |> String.split("\n")
+      |> Enum.map(&parseCommand/1)
+      |> Enum.reduce(["/", root, MapSet.new([["/"]])], fn x, acc -> executeCommand(x, acc) end)
+
+    otherDirectories = MapSet.delete(visitedPaths, [["/"]])
+
+    space_available = 70_000_000 - getSize(get_in(tree, ["/"]))
+    additional_space_needed = 30_000_000 - space_available
+
+    directorySizes =
+      otherDirectories
+      |> Enum.map(&(get_in(tree, &1) |> getSize()))
+      |> Enum.sort()
+      |> Enum.filter(&(&1 >= additional_space_needed))
+      |> hd
   end
 
   @spec getSize(list) :: number
   @doc """
   Returns the size of a filetree in form of a Map.
   """
-  def getSize(tree) do
-    tree |> Map.to_list() |> List.flatten() |> Enum.map(&getSize/1) |> Enum.sum()
+  def getSize(element) when is_integer(element), do: element
+
+  def getSize(tuple) when is_tuple(tuple) and tuple_size(tuple) == 2 do
+    {_, map} = tuple
+    getSize(map)
+  end
+
+  def getSize(map) when is_map(map) do
+    map |> Map.to_list() |> List.flatten() |> Enum.map(&getSize/1) |> Enum.sum()
   end
 end
