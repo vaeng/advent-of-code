@@ -24,7 +24,9 @@ defmodule AdventOfCode.Day12 do
     startingPoints = 1..xMax |> Enum.map(&[&1, 0])
 
     startingPoints
-    |> Enum.map(&updateUntilStop([{&1, 0, heuristic(start, stop)}], heightMap, stop))
+    |> Task.async_stream(&updateUntilStop([{&1, 0, heuristic(start, stop)}], heightMap, stop),
+      timeout: :infinity
+    )
     |> Enum.min()
   end
 
