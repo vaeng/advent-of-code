@@ -2,7 +2,7 @@
 
   <!-- AOC TILES BEGIN -->
 <h1 align="center">
-    2022 - 26 ⭐
+    2022 - 28 ⭐
   </h1>
   <a href="2022\Elixir\lib\advent_of_code\day_01.ex">
     <img src="AoCTiles\Media\2022\01.png" width="161px">
@@ -43,6 +43,9 @@
   </a>
   <a href="2022\Elixir\lib\advent_of_code\day_13.ex">
     <img src="AoCTiles\Media\2022\13.png" width="161px">
+  </a>
+    <a href="2022\Elixir\lib\advent_of_code\day_14.ex">
+    <img src="AoCTiles\Media\2022\14.png" width="161px">
   </a>
 
   <h1 align="center">
