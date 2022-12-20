@@ -3,12 +3,21 @@ defmodule AdventOfCode.Day20Test do
 
   import AdventOfCode.Day20
 
-  @tag :skip
   test "part1" do
-    input = nil
-    result = part1(input)
+    args =  """
+            1
+            2
+            -3
+            3
+            -2
+            0
+            4
+            """
 
-    assert result
+    args = String.trim(args)
+    result = part1(args)
+
+    assert result == 3
   end
 
   @tag :skip
