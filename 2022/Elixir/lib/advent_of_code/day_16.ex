@@ -18,11 +18,10 @@ defmodule AdventOfCode.Day16 do
     noAA = allKeys -- ["AA"]
     # noAA = Enum.filter(noAA, &(valveProperties[&1].rate != 0))
 
-    Task.async_stream(permutate(noAA), &getResults(&1, valveProperties, distanceMap),
-      ordered: false
-    )
-    |> Enum.max_by(fn {:ok, [_, _, score]} -> score end)
-    |> then(&List.last(elem(&1, 1)))
+    permutate(noAA)
+    |> Stream.map(&getResults(&1, valveProperties, distanceMap))
+    |> Enum.max_by(fn [_, _, score] -> score end)
+    |> then(&List.last(&1))
   end
 
   def getResults(path, valveProperties, distanceMap) do

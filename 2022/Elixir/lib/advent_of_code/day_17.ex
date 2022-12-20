@@ -1,4 +1,6 @@
 defmodule AdventOfCode.Day17 do
+  @starttime DateTime.utc_now()
+
   def part1(args) do
     # parse input
     directions =
@@ -25,7 +27,8 @@ defmodule AdventOfCode.Day17 do
   end
 
   def handleRock(layout, fallingRock, :down, currentRock, lastLine, rocksdropped) do
-    if rocksdropped == 1_000_000_000_000 + 1 do
+    droplimit = 1_000_000_000_000 + 1
+    if rocksdropped == droplimit do
       # inspectLayout(layout, 0, lastLine)
       {:halt, lastLine}
     else
@@ -33,11 +36,12 @@ defmodule AdventOfCode.Day17 do
 
       case willCollide?(layout, movedPositions) do
         true ->
+          memoryLimit = 100
           updatedLayout = place(layout, fallingRock)
 
           newLastline = Enum.max(Map.keys(updatedLayout))
-          trimFrom = newLastline - 50
-          trimTo = trimFrom + 25
+          trimFrom = newLastline - 2 * memoryLimit
+          trimTo = newLastline - memoryLimit
 
           trimmedLayout =
             Enum.reduce(trimFrom..trimTo, updatedLayout, fn x, acc ->
@@ -47,6 +51,14 @@ defmodule AdventOfCode.Day17 do
           nextRock = getNextRock(currentRock)
           nextFallingRockPosition = initialPosition(nextRock, newLastline + 1)
           # fallingRock}
+          if Integer.mod(rocksdropped, 1000_000) == 0 do
+            percentage = Float.round(100*rocksdropped/droplimit, 1)
+            time_elapsed = DateTime.diff(DateTime.utc_now(), @starttime)
+            forecast = time_elapsed / rocksdropped * droplimit
+            hours_elapsed = Float.round(time_elapsed/ 60 / 60 )
+            hours_forecast = Float.round(forecast/ 60 / 60)
+           IO.puts(IO.ANSI.clear_line() <> "Dropped Rock #{rocksdropped} of #{droplimit} (#{percentage} %) Elapsed time (#{hours_elapsed} hours of #{hours_forecast})")
+          end
           {:cont,
            [trimmedLayout, nextRock, nextFallingRockPosition, newLastline, rocksdropped + 1]}
 
