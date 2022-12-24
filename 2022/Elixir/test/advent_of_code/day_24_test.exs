@@ -3,12 +3,20 @@ defmodule AdventOfCode.Day24Test do
 
   import AdventOfCode.Day24
 
-  @tag :skip
   test "part1" do
-    input = nil
+    input = """
+    #.######
+    #>>.<^<#
+    #.<..<<#
+    #>v.><>#
+    #<^v^^>#
+    ######.#
+    """
+    input = String.trim(input)
+
     result = part1(input)
 
-    assert result
+    assert result == 18
   end
 
   @tag :skip
