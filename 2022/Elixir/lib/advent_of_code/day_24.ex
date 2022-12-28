@@ -1,14 +1,48 @@
 defmodule AdventOfCode.Day24 do
   def part1(args) do
     initial_map = parse_input(args)
-    [{start_position, _}] = Enum.filter(map, fn {[_x,y], k} -> y == 0 and k == [] end)
+    [_, y_max] = Enum.max(Map.keys(initial_map))
+    [{start_position, _}] = Enum.filter(initial_map, fn {[_x, y], k} -> y == 0 and k == [] end)
+    make_run(initial_map, 0, y_max, start_position) |> hd
+  end
 
-    0..100
-    |> Enum.reduce_while([initial_map, [start_position]], fn minute, [map, pos_expedition_position] ->
+  def part2(args) do
+    initial_map = parse_input(args)
+    [_, y_max] = Enum.max(Map.keys(initial_map))
+    [{start_position, _}] = Enum.filter(initial_map, fn {[_x, y], k} -> y == 0 and k == [] end)
+    [{goal_position, _}] = Enum.filter(initial_map, fn {[_x, y], k} -> y == y_max and k == [] end)
+    [to_goal, temp_map] = make_run(initial_map, 0, y_max, start_position)
+    [back_to_start, temp_map] = make_run(temp_map, to_goal, 0, goal_position)
+    [back_to_goal, _] = make_run(temp_map, back_to_start, y_max, start_position)
+    back_to_goal
+  end
+
+  def make_run(start_map, start_time, goal_line, start_position) do
+    [x_max, y_max] = Enum.max(Map.keys(start_map))
+
+    start_time..100_000
+    |> Enum.reduce_while([start_map, [start_position]], fn minute, [map, possible_expedition_positions] ->
+
+      next_map = progress_blizzards(map)
+      next_moves = possible_expedition_positions
+                           |> Enum.reduce([], fn pos, lst -> get_possible_moves(pos) ++ lst end)
+                           |> Enum.uniq()
+                           |> Enum.filter(fn [x, y] -> x >= 0 and y >= 0 and x <= x_max and y <= y_max and Map.get(next_map, [x, y], []) == [] end)
+      if finished?(next_moves, goal_line) do
+        {:halt, [minute + 1, next_map]}
+      else
+        {:cont, [next_map, next_moves]}
+      end
 
     end)
+  end
 
-  def part2(_args) do
+  def finished?(moves, goal_line) do
+    Enum.any?(moves, fn [_x, y] -> y == goal_line end)
+  end
+
+  def get_possible_moves([x, y]) do
+    [[x, y], [x, y + 1], [x, y - 1], [x + 1, y], [x - 1, y]]
   end
 
   def progress_blizzards(map) do
