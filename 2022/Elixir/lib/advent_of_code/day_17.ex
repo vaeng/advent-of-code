@@ -3,31 +3,83 @@ defmodule AdventOfCode.Day17 do
 
   def part1(args) do
     # parse input
-    directions =
-      args
-      |> String.trim()
-      |> String.codepoints()
-      |> Stream.map(fn dir -> if dir == ">", do: :right, else: :left end)
-      |> Stream.cycle()
+    directions = parseInputToStream(args)
+
 
     width = 7
-
-    startLayout = %{0 => List.duplicate(:rock, width + 2)}
-    rockLimit = 2022
+    solidline = List.duplicate(:rock, width + 2)
+    startLayout = %{0 => solidline}
+    droplimit = 1000000000000
     startRock = :horiz
     initialFallingRock = initialPosition(startRock, 1)
 
-    directions
+    solution = directions
     |> Enum.reduce_while(
-      [startLayout, startRock, initialFallingRock, 1, 1],
-      fn currentDir, [layout, currentRock, fallingRock, lastLine, rocksdropped] ->
-        handleRock(layout, fallingRock, currentDir, currentRock, lastLine, rocksdropped)
+      [%{}, Map.new(), startLayout, startRock, initialFallingRock, 1, 1],
+      fn {currentDir, idx}, [heights, map, layout, currentRock, fallingRock, lastLine, rocksdropped] ->
+        newItem = [idx, currentRock, Map.fetch!(layout, lastLine - 1)]
+        if Map.has_key?(map, newItem) do
+          firstSeen = Map.get(map, newItem)
+          currently = rocksdropped
+          cycleLength = firstSeen - currently
+          first_height = Map.get(heights, firstSeen)
+          cycleHeight = lastLine - first_height
+          cycles_left = div(droplimit - rocksdropped, cycleLength) - 1
+          lastLine = lastLine + cycles_left * cycleHeight
+          rocksdropped = rocksdropped + cycles_left * cycleLength
+
+          {status, [layout, currentRock, movedPositions, lastLine, rocksdropped]} = handleRock(layout, fallingRock, currentDir, currentRock, lastLine, rocksdropped, droplimit)
+          {status, [Map.new(), Map.new() | [layout, currentRock, movedPositions, lastLine, rocksdropped]]}
+
+          # {:halt, [Map.fetch!(map, newItem), rocksdropped, [Map.put_new(heights, rocksdropped, lastLine), idx, layout, fallingRock, currentDir, currentRock, lastLine, rocksdropped]]}
+        else
+         {status, [layout, currentRock, movedPositions, lastLine, rocksdropped]} = handleRock(layout, fallingRock, currentDir, currentRock, lastLine, rocksdropped, droplimit)
+         {status, [Map.put_new(heights, rocksdropped, lastLine), Map.put(map, newItem, rocksdropped) | [layout, currentRock, movedPositions, lastLine, rocksdropped]]}
+        end
       end
     )
+
+    cond do
+      is_integer(solution) -> solution
+      true ->
+        [firstSeen, againSeen, [heights, idx, layout, fallingRock, currentDir, currentRock, lastLine, rocksdropped]] = solution
+        # time until entering the loop:
+        init = 1000000000000 - firstSeen
+        loop_length = againSeen - firstSeen
+        loop_counter = div(init, loop_length)
+        rocks_left = Integer.mod(init, loop_length)
+
+        height_at_loop_start = Map.get(heights, firstSeen)
+        height_at_loop_end = Map.get(heights, againSeen)
+        loop_height = height_at_loop_end - height_at_loop_start
+        rest_of_the_rocks = Map.get(heights, firstSeen + rocks_left)
+        result = height_at_loop_start + loop_height * loop_counter + rest_of_the_rocks
+        1514285714288 - result
+    end
   end
 
-  def handleRock(layout, fallingRock, :down, currentRock, lastLine, rocksdropped) do
-    droplimit = 1_000_000_000_000 + 1
+  def updateStatus(rocksdropped,droplimit) do
+    if Integer.mod(rocksdropped, 1000_000) == 0 do
+      percentage = Float.round(100*rocksdropped/droplimit, 1)
+      time_elapsed = DateTime.diff(DateTime.utc_now(), @starttime)
+      forecast = time_elapsed / rocksdropped * droplimit
+      hours_elapsed = Float.round(time_elapsed/ 60 / 60 )
+      hours_forecast = Float.round(forecast/ 60 / 60)
+     IO.puts(IO.ANSI.clear_line() <> "Dropped Rock #{rocksdropped} of #{droplimit} (#{percentage} %) Elapsed time (#{hours_elapsed} hours of #{hours_forecast})")
+    end
+  end
+
+  def parseInputToStream(args) do
+    args
+      |> String.trim()
+      |> String.codepoints()
+      |> Enum.with_index()
+      |> Stream.map(fn {dir, idx} -> if dir == ">", do: {:right, idx}, else: {:left, idx} end)
+      |> Stream.cycle()
+  end
+
+  def handleRock(layout, fallingRock, :down, currentRock, lastLine, rocksdropped, droplimit) do
+
     if rocksdropped == droplimit do
       # inspectLayout(layout, 0, lastLine)
       {:halt, lastLine}
@@ -51,14 +103,7 @@ defmodule AdventOfCode.Day17 do
           nextRock = getNextRock(currentRock)
           nextFallingRockPosition = initialPosition(nextRock, newLastline + 1)
           # fallingRock}
-          if Integer.mod(rocksdropped, 1000_000) == 0 do
-            percentage = Float.round(100*rocksdropped/droplimit, 1)
-            time_elapsed = DateTime.diff(DateTime.utc_now(), @starttime)
-            forecast = time_elapsed / rocksdropped * droplimit
-            hours_elapsed = Float.round(time_elapsed/ 60 / 60 )
-            hours_forecast = Float.round(forecast/ 60 / 60)
-           IO.puts(IO.ANSI.clear_line() <> "Dropped Rock #{rocksdropped} of #{droplimit} (#{percentage} %) Elapsed time (#{hours_elapsed} hours of #{hours_forecast})")
-          end
+
           {:cont,
            [trimmedLayout, nextRock, nextFallingRockPosition, newLastline, rocksdropped + 1]}
 
@@ -69,12 +114,12 @@ defmodule AdventOfCode.Day17 do
     end
   end
 
-  def handleRock(layout, fallingRock, direction, currentRock, lastLine, rocksdropped) do
+  def handleRock(layout, fallingRock, direction, currentRock, lastLine, rocksdropped, droplimit) do
     movedPositions = move(fallingRock, direction)
 
     case willCollide?(layout, movedPositions) do
-      true -> handleRock(layout, fallingRock, :down, currentRock, lastLine, rocksdropped)
-      false -> handleRock(layout, movedPositions, :down, currentRock, lastLine, rocksdropped)
+      true -> handleRock(layout, fallingRock, :down, currentRock, lastLine, rocksdropped, droplimit)
+      false -> handleRock(layout, movedPositions, :down, currentRock, lastLine, rocksdropped, droplimit)
     end
   end
 

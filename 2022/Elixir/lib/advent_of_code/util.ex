@@ -68,4 +68,15 @@ defmodule AdventOfCode.Util do
     |> List.zip()
     |> Enum.map(&Tuple.to_list/1)
   end
+
+  @type direction :: :north | :east | :west | :south | :up | :down
+
+  @spec getNext([...], [...] | direction) :: [...]
+  def getNext([x, y, z], :north), do: [x, y + 1, z]
+  def getNext([x, y, z], :east), do: [x + 1, y, z]
+  def getNext([x, y, z], :south), do: [x, y - 1, z]
+  def getNext([x, y, z], :west), do: [x - 1, y, z]
+  def getNext([x, y, z], :up), do: [x, y, z + 1]
+  def getNext([x, y, z], :down), do: [x, y, z - 1]
+  def getNext([x, y, z], directions), do: Enum.reduce(directions, [x, y, z], &getNext(&2, &1))
 end
