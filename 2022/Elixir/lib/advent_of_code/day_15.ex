@@ -251,12 +251,40 @@ defmodule AdventOfCode.Day15 do
   def part2(args, example \\ false) do
     coords = parseToIntLists(args)
     limit = if example, do: 20, else: 4_000_000
+    initial_fringes = Stream.flat_map(coords, fn coord -> fringe_stream(coord, limit) end)
 
-
+    [col, line] = Enum.reduce(coords, initial_fringes, fn coord, fringes -> Stream.reject(fringes, &is_covered?(coord, &1)) end) |> Stream.uniq() |> Enum.to_list() |> hd
+    line + 4000000 * col
   end
 
-  def fringe_stream() do
+  def fringe_stream([sensorX, sensorY, beaconX, beaconY], limit) do
+    radius = manhatten_distance([sensorX, sensorY], [beaconX, beaconY])
+    left = sensorX - radius
+    right = sensorX + radius
+    up = sensorY - radius
+    down = sensorY + radius
 
+    up_to_right = make_streamed_line([sensorX, up-1], [right+1, sensorY])
+    right_to_down = make_streamed_line([right+1, sensorY], [sensorX, down+1])
+    down_to_left = make_streamed_line([sensorX, down+1], [left-1, sensorY])
+    left_to_up = make_streamed_line([left-1, sensorY], [sensorX, up-1])
+
+    Stream.concat([up_to_right, right_to_down, down_to_left, left_to_up])
+    |> Stream.filter(fn [x,y] -> x >= 0 and y >= 0 and y <= limit and x <= limit end)
+  end
+
+  def make_streamed_line([start_x, start_y], [exclusive_end_x, exclusive_end_y]) do
+    Stream.zip_with(start_x..(exclusive_end_x-1), start_y..(exclusive_end_y-1), fn  x,y -> [x,y] end)
+  end
+
+  def is_covered?([sensorX, sensorY, beaconX, beaconY], [x,y]) do
+    radius = manhatten_distance([sensorX, sensorY], [beaconX, beaconY])
+
+    distanceToLine = abs(y - sensorY)
+    left = sensorX - radius + distanceToLine
+    right = sensorX + radius - distanceToLine
+
+    x >= left and x <= right
   end
 
 end
