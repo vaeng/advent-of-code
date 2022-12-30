@@ -1,16 +1,18 @@
 defmodule AdventOfCode.Day19 do
 
-
-
   def part1(args, limit \\ 24) do
     resources = %{clay: 0, ore: 0, obsidian: 0, geodes: 0}
     workers = %{ore: 1, clay: 0, obsidian: 0, geodes: 0}
     costs = inputToCostTable(args)
     Enum.map(Map.keys(costs), fn id ->
-    Enum.reduce(1..limit, [{resources,workers}], fn round, state -> Enum.flat_map(state, &progress_one_minute(&1,id,costs))     |> Enum.sort_by(fn state -> potential(state, round, limit, costs, id) end, :desc)
-    |> Enum.take(3000) end) |> (then &get_geode_number(&1)*id)
-  end)
-  |> Enum.sum()
+      Enum.reduce(1..limit, [{resources,workers}],
+        fn round, state ->
+          Enum.flat_map(state, &progress_one_minute(&1,id,costs))
+          |> Enum.sort_by(fn state -> potential(state, round, limit, costs, id) end, :desc)
+          |> Enum.take(3000) end)
+      |> (then &get_geode_number(&1)*id)
+    end)
+    |> Enum.sum()
   end
 
   def progress_one_minute({resources, workers}, id, costs) do
@@ -32,15 +34,23 @@ defmodule AdventOfCode.Day19 do
     resources = %{clay: 0, ore: 0, obsidian: 0, geodes: 0}
     workers = %{ore: 1, clay: 0, obsidian: 0, geodes: 0}
     costs = inputToCostTable(args)
-    Enum.map((Map.keys(costs) |> Enum.take(3)), fn id ->
-    Enum.reduce(1..limit, [{resources,workers}], fn round, state -> Enum.flat_map(state, &progress_one_minute(&1,id,costs))     |> Enum.sort_by(fn state -> potential(state, round, limit, costs, id) end, :desc)
-    |> Enum.take(3000) end) |> (then &get_geode_number(&1))
-  end)
+    Enum.map((Map.keys(costs) |> Enum.take(3)),
+     fn id -> Enum.reduce(1..limit, [{resources,workers}],
+                          fn round, state -> Enum.flat_map(state, &progress_one_minute(&1,id,costs))
+                                             |> Enum.sort_by(fn state -> potential(state, round, limit, costs, id) end, :desc)
+                                             |> Enum.take(3000) end)
+              |> (then &get_geode_number(&1))
+      end)
     |> Enum.product()
   end
 
   def inputToCostTable(args) do
-    Regex.scan(~r/\d+/, args) |> Enum.map(&String.to_integer(hd(&1))) |> Enum.chunk_every(7) |> Enum.reduce(Map.new(), fn [id, orecost, claycost, obscostore, obscostclay, geocostore, geocostobs], map -> Map.put(map, id, %{ore: %{ore: orecost}, clay: %{ore: claycost}, obsidian: %{ore: obscostore, clay: obscostclay}, geodes: %{ore: geocostore, obsidian: geocostobs} }) end)
+    Regex.scan(~r/\d+/, args)
+    |> Enum.map(&String.to_integer(hd(&1)))
+    |> Enum.chunk_every(7) |> Enum.reduce(Map.new(),
+        fn [id, orecost, claycost, obscostore, obscostclay, geocostore, geocostobs], map ->
+           Map.put(map, id, %{ore: %{ore: orecost}, clay: %{ore: claycost}, obsidian: %{ore: obscostore, clay: obscostclay}, geodes: %{ore: geocostore, obsidian: geocostobs} })
+        end)
   end
 
   def updateResources(resources, workers) do
@@ -79,8 +89,5 @@ defmodule AdventOfCode.Day19 do
     potential_obs = resources.obsidian + workers.obsidian * time_left + div(potential_clay, costs[id].obsidian.clay)
     potential_geodes = resources.geodes + workers.geodes * time_left
     potential_geodes * 10000 + potential_obs * 100 + potential_ore + potential_clay
-    #total_potential = potential_geodes + div(potential_obs, costs[id].geodes.obsidian) + div(potential_ore, costs[id].geodes.ore)
-
   end
-
 end
